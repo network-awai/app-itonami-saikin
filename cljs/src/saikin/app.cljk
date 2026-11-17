@@ -13,8 +13,8 @@
   this migration itself changed:
 
   - `:app/route-count` and `:app/routes` now report what `wrangler.jsonc`
-    actually declares (2 route patterns: `s41k1n01.etzhayyim.com/*` and
-    `saikin.etzhayyim.com/*`), not the stale `0` / `[]` the Svelte
+    actually declares (2 route patterns: `s41k1n01.itonami.cloud/*` and
+    `saikin.itonami.cloud/*`), not the stale `0` / `[]` the Svelte
     constant carried.
   - `:app/xrpc?` is now false, even though the Svelte constant carried
     `true`. This migration's wrangler.jsonc drops `main` (see that
@@ -26,7 +26,7 @@
     backend Worker/XRPC code is out of scope for a frontend migration.
   - `:app/relative-path` now names this file
     (`cljs/src/saikin/app.cljk`), not the deleted Svelte one
-    (`60-apps/etzhayyim-project-saikin/svelte/src/routes/+page.svelte`).
+    (`60-apps/itonami-project-saikin/svelte/src/routes/+page.svelte`).
 
   `public/index.html`'s inlined <style> was produced once, at authoring
   time, by `jp-go-dds.page/->page` running on the JVM (via this deps.edn's
@@ -40,11 +40,11 @@
 
     (require '[jp-go-dds.page :as page] '[clojure.java.io :as io])
     (spit \"public/index.html\"
-          (page/->page {:title \"etzhayyim-project-saikin\"
+          (page/->page {:title \"itonami-project-saikin\"
                          :lang \"ja\"
                          :description \"saikin (細菌) — bacteria horizontal transfer layer appview (reagent + re-frame + jp-go-dds).\"
                          :css (slurp (io/resource \"jp_go_dds/dds.css\"))}
-                        [:div {:id \"app\"} \"etzhayyim-project-saikin loading…\"]
+                        [:div {:id \"app\"} \"itonami-project-saikin loading…\"]
                         [:script {:src \"js/app.js\"}]))"
   (:require [reagent.dom :as rdom]
             [re-frame.core :as rf]
@@ -56,12 +56,12 @@
 ;; held (title/project/name/kind/routeCount/routes/vars/xrpc/relativePath).
 
 (def default-db
-  {:app/title "Ai etzhayyim Project Saikin"
-   :app/project "etzhayyim-project-saikin"
-   :app/name "etzhayyim-project-saikin"
+  {:app/title "Ai itonami Project Saikin"
+   :app/project "itonami-project-saikin"
+   :app/name "itonami-project-saikin"
    :app/kind "cloudflare surface"
    :app/route-count 2
-   :app/routes ["s41k1n01.etzhayyim.com/*" "saikin.etzhayyim.com/*"]
+   :app/routes ["s41k1n01.itonami.cloud/*" "saikin.itonami.cloud/*"]
    :app/vars ["AGENTGATEWAY_MCP_ROUTER_URL" "APP_CAPABILITIES" "APP_DESCRIPTION"
               "APP_DISPLAY_NAME" "APP_FRAMEWORK" "APP_NANOID" "APP_PERFORMER_TYPE"
               "APP_UI_TYPE"]

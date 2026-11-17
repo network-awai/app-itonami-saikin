@@ -1,11 +1,11 @@
-// saikin.etzhayyim.com — bacteria horizontal transfer layer (saikin = 細菌)
+// saikin.itonami.cloud — bacteria horizontal transfer layer (saikin = 細菌)
 // Thin-edge dispatcher: business logic in AgentGateway MCP + pod-side LangServer.
 // 5 methods: probeEnvironment / transferSignal / formColony / handoffToKi / lyse
 //
-// Also forwards `com.etzhayyim.mcp.message` envelopes (MCP `tools/call`) to the
-// dispatcher's dedicated `/xrpc/com.etzhayyim.mcp.message` route so that LangGraph
-// `mcp_tool` nodes (ADR-2605082000 §2.6) bound as `mcp://com.etzhayyim.apps.saikin.*`
-// resolve to this Worker via vertex_mcp_tool_def.actor_host=saikin.etzhayyim.com.
+// Also forwards `cloud.itonami.mcp.message` envelopes (MCP `tools/call`) to the
+// dispatcher's dedicated `/xrpc/cloud.itonami.mcp.message` route so that LangGraph
+// `mcp_tool` nodes (ADR-2605082000 §2.6) bound as `mcp://cloud.itonami.apps.saikin.*`
+// resolve to this Worker via vertex_mcp_tool_def.actor_host=saikin.itonami.cloud.
 
 interface SecretBinding { get(): Promise<string>; }
 interface Env {
@@ -15,9 +15,9 @@ interface Env {
 }
 interface ExportedHandler<E> { fetch(req: Request, env: E): Promise<Response>; }
 
-const NSID_PREFIX = "com.etzhayyim.apps.saikin.";
-const MCP_NSID = "com.etzhayyim.mcp.message";
-const ACTOR_DID = "did:web:saikin.etzhayyim.com";
+const NSID_PREFIX = "cloud.itonami.apps.saikin.";
+const MCP_NSID = "cloud.itonami.mcp.message";
+const ACTOR_DID = "did:web:saikin.itonami.cloud";
 
 export default {
   async fetch(req: Request, env: Env): Promise<Response> {
@@ -38,11 +38,11 @@ export default {
         mcp: {
           envelope: MCP_NSID,
           tools: [
-            "com.etzhayyim.apps.saikin.probeEnvironment",
-            "com.etzhayyim.apps.saikin.transferSignal",
-            "com.etzhayyim.apps.saikin.formColony",
-            "com.etzhayyim.apps.saikin.handoffToKi",
-            "com.etzhayyim.apps.saikin.lyse",
+            "cloud.itonami.apps.saikin.probeEnvironment",
+            "cloud.itonami.apps.saikin.transferSignal",
+            "cloud.itonami.apps.saikin.formColony",
+            "cloud.itonami.apps.saikin.handoffToKi",
+            "cloud.itonami.apps.saikin.lyse",
           ],
         },
       });
@@ -75,7 +75,7 @@ async function bodyWithQuery(req: Request, url: URL): Promise<Record<string, unk
 }
 
 async function proxyToDispatcher(env: Env, nsid: string, body: Record<string, unknown>): Promise<Response> {
-  const dispatcherUrl = env.DISPATCHER_URL ?? "https://dispatcher.etzhayyim.com";
+  const dispatcherUrl = env.DISPATCHER_URL ?? "https://dispatcher.itonami.cloud";
   const secret = typeof env.DISPATCHER_INTERNAL_SECRET === "object"
     ? await env.DISPATCHER_INTERNAL_SECRET.get()
     : (env.DISPATCHER_INTERNAL_SECRET ?? "");
