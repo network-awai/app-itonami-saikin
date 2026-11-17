@@ -1,53 +1,50 @@
-# app-itonami-saikin
+# app-itonami-saikin — Saikin
 
-saikin (細菌) — bacteria horizontal transfer layer. Propagates knowledge
-laterally across disconnected actor clusters via probe, transfer, colony
-formation, and lysis. It is the Cloudflare Worker serving
-`saikin.itonami.cloud` and `s41k1n01.itonami.cloud`.
+細菌 — 水平伝達の層です。場所ごとに環境を調べ（probe）、そこで集落（colony）を作り、集落の間で信号を水平に移し（transfer）、Ki に渡せる形にまとめます。溶菌（lyse）した集落は信号を放出して止まります。
 
-## Frontend migrated to ClojureScript (2026-09-07)
+Tauri **3.0.0-alpha.6** の独立 app（`tauri-runtime-wry`、OS の WebView）と、同じファイルの static Web ビルドです。記録はすべてこの端末の中（localStorage、key `itonami.saikin.v1`）に保存し、外部へは通信しません。外部操作の宣言もありません（`dist/descriptor.json` の `operations: []`）。保存に失敗したときは画面に表示します。
 
-The `svelte/` directory (SvelteKit) is gone. The frontend is now
-ClojureScript — reagent + re-frame + `jp-go-dds` (デジタル庁デザインシステム) —
-at [`cljs/`](cljs). This was a **frontend-only** migration; the backend
-Worker/XRPC logic was moved, not rewritten:
+## できること
 
-| Then | Now |
-|---|---|
-| `svelte/src/routes/+page.svelte` (the status page) | [`cljs/src/saikin/app.cljk`](cljs/src/saikin/app.cljk) — same fields, faithfully ported |
-| `svelte/src/routes/xrpc/[...path]/+server.ts` (the file that actually deployed, per `wrangler.jsonc`'s old `main`) | [`src/xrpc-dispatcher.ts`](src/xrpc-dispatcher.ts) — moved byte-for-byte, only a provenance header comment added |
-| `wrangler.jsonc` `main: svelte/.svelte-kit/cloudflare/_worker.js` | `main` dropped entirely |
-| `wrangler.jsonc` `assets.directory: ./svelte/.svelte-kit/cloudflare/client` | `assets.directory: ./cljs/public` |
+| 操作 | 内容 |
+| --- | --- |
+| 環境を調べる (probeEnvironment) | 信号は改行かカンマで区切ります。 |
+| 集落を作る (formColony) | その場所で調べた信号を持って始まります。先に probe が必要です。 |
+| 信号を移す (transferSignal) | — |
+| Ki に渡す形にする (handoffToKi) | Ki の absorb 入力の形を表示するだけで、どこにも送りません。 |
+| 溶菌させる (lyse) | — |
 
-Neither `src/app.ts` nor the moved `src/xrpc-dispatcher.ts` calls
-`env.ASSETS.fetch`, so `main` was dropped rather than repointed at either —
-putting either Worker in front of the static assets with no
-`env.ASSETS.fetch` call would mean nothing serves the frontend. Both backend
-files are orphaned source, not currently wired to any deploy target. See
-`wrangler.jsonc`'s header comment and `src/xrpc-dispatcher.ts`'s header
-comment for the full reasoning.
+記録（collection）: `cloud.itonami.apps.saikin.colony`、`cloud.itonami.apps.saikin.probe`、`cloud.itonami.apps.saikin.transfer`
 
-**This is unverified**: `wrangler deploy` / `wrangler dev` were not run
-against this change.
+## 補足
 
-Three fields in `cljs/src/saikin/app.cljk`'s `default-db` were also
-corrected, not merely ported, against what the old Svelte constant held —
-see that namespace's docstring for detail:
+- **この domain は新しく設計したものです。** 旧 Worker は処理を外部の AgentGateway / LangServer に転送していて、処理の中身はこの repository にありませんでした。旧 Worker の method 名・README・BPMN をもとに、この端末だけで動く domain を作りました。旧サービスと同じ挙動である保証はありません。
+- 「Ki に渡す形にする」は Ki の absorb 入力の形を画面に出すだけで、どこにも送りません。app 同士は直接つながっていません。
+- 旧 `cljs/`（UI）は残しています。
 
-- `:app/route-count` / `:app/routes` now report the two route patterns
-  `wrangler.jsonc` actually declares, not the stale `0` / `[]` the Svelte
-  constant carried.
-- `:app/xrpc?` is now `false`, even though the Svelte constant carried
-  `true`, because `main` no longer deploys the XRPC handler (it is
-  preserved, unwired, at `src/xrpc-dispatcher.ts`).
-- `:app/relative-path` now names `cljs/src/saikin/app.cljk`, not the
-  deleted Svelte source path.
+## 構成
 
-## Build and test
+| パス | 役割 |
+| --- | --- |
+| `src/domain/` | domain logic（TypeScript）。ビルド時に Node の type stripping で JS にします（bundler・依存なし） |
+| `src/local-store.js` | この端末内の record store。domain が使う `read` / `write` を localStorage で実装 |
+| `src/app-def.js` | 画面の操作と domain 関数・collection の対応 |
+| `src/ui/` | 依存なしの UI。DOM はテキストノードだけで組み、HTML 文字列を使いません（CSP `style-src 'self'`） |
+| `vendor/` | kotoba-lang/kotoba の `kotoba-client-runtime.js` / consent CSS と `PINS.json`。`scripts/build.mjs` が digest のずれで失敗します |
+| `src-tauri/` | Tauri v3 host。read-only command は `awai_host_info` の 1 つだけ。filesystem・network・shell・installer 権限なし |
+| `cljs/` | 旧 ClojureScript UI（amu でビルド）。この app のビルド・テストでは使いません |
 
-```bash
-cd cljs
-npm install
-npm run build   # amu compile --target wasm32-browser app -> public/js/app.js
-npm test        # amu compile --target wasm32-browser test && node out/tests.js
+## コマンド
+
+```sh
+npm ci
+npm test              # build してから domain と local-only のテスト（local-only.test.mjs, saikin.test.ts）
+npm run build         # dist/ と SHA-256 の release.json
+npm run build:desktop # native desktop 実行ファイル（bundle・署名なし）
 ```
+
+## 状態と制限（AWAI-3079, 2026-11-17）
+
+- 旧構成（Cloudflare Worker の XRPC dispatcher / adapter、`wrangler.jsonc`、`@etzhayyim/sdk`）は削除しました。履歴は git にあります。
+- 検証済み: `npm test`、`npm run build`、`cargo check`（Tauri 3.0.0-alpha.6）。
+- 未検証: native window の起動、`tauri build`、Android、署名、配布。アイコンは app-soshiki の仮アイコンです。
