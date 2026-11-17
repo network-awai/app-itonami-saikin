@@ -1,6 +1,6 @@
 {
-  "@context": "https://etzhayyim.com/ns/kotodama/v1",
-  "@id": "did:web:saikin.etzhayyim.com",
+  "@context": "https://itonami.cloud/ns/kotodama/v1",
+  "@id": "did:web:saikin.itonami.cloud",
   "name": "saikin",
   "nanoid": "s41k1n01",
   "project": "saikin",
@@ -14,7 +14,7 @@
     "avatar": "細菌",
     "isBot": true,
     "agentType": "autonomous",
-    "operator": "etzhayyim",
+    "operator": "itonami",
     "capabilities": ["horizontal-transfer", "colony-formation", "signal-probe", "lysis"],
     "protocols": ["xrpc", "mcp"]
   },
@@ -24,7 +24,7 @@
   },
   "triggers": {
     "subscribeRepos": {
-      "collections": ["com.etzhayyim.apps.saikin.signal"]
+      "collections": ["cloud.itonami.apps.saikin.signal"]
     }
   }
 }

@@ -1,9 +1,9 @@
-# com-etzhayyim-app-saikin
+# app-itonami-saikin
 
 saikin (細菌) — bacteria horizontal transfer layer. Propagates knowledge
 laterally across disconnected actor clusters via probe, transfer, colony
 formation, and lysis. It is the Cloudflare Worker serving
-`saikin.etzhayyim.com` and `s41k1n01.etzhayyim.com`.
+`saikin.itonami.cloud` and `s41k1n01.itonami.cloud`.
 
 ## Frontend migrated to ClojureScript (2026-09-07)
 

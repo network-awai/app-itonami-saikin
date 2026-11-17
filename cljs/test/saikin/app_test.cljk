@@ -11,12 +11,12 @@
   (testing ":initialize-db populates every fact the Svelte scaffold held"
     (rf/dispatch-sync [:initialize-db])
     (is (= app/default-db @rf-db/app-db))
-    (is (= "Ai etzhayyim Project Saikin" @(rf/subscribe [:app/title])))
-    (is (= "etzhayyim-project-saikin" @(rf/subscribe [:app/name])))
-    (is (= "etzhayyim-project-saikin" @(rf/subscribe [:app/project])))
+    (is (= "Ai itonami Project Saikin" @(rf/subscribe [:app/title])))
+    (is (= "itonami-project-saikin" @(rf/subscribe [:app/name])))
+    (is (= "itonami-project-saikin" @(rf/subscribe [:app/project])))
     (is (= "cloudflare surface" @(rf/subscribe [:app/kind])))
     (is (= 2 @(rf/subscribe [:app/route-count])))
-    (is (= ["s41k1n01.etzhayyim.com/*" "saikin.etzhayyim.com/*"]
+    (is (= ["s41k1n01.itonami.cloud/*" "saikin.itonami.cloud/*"]
            @(rf/subscribe [:app/routes])))
     (is (= 8 (count @(rf/subscribe [:app/vars]))))
     (is (false? @(rf/subscribe [:app/xrpc?])))
