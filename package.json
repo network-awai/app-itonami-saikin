@@ -6,13 +6,15 @@
   "itonami": {
     "id": "cloud.itonami.saikin",
     "title": "Saikin",
-    "storageKey": "itonami.saikin.v1"
+    "storageKey": "itonami.saikin.v1",
+    "storeId": "network.itonami.saikin"
   },
   "scripts": {
     "build": "node scripts/build.mjs",
     "test": "npm run build && node --test test/*.test.mjs test/*.test.ts",
     "tauri": "tauri",
-    "build:desktop": "npm run build && tauri build --no-bundle"
+    "build:desktop": "npm run build && tauri build --no-bundle",
+    "build:android": "sh scripts/android-apk.sh"
   },
   "devDependencies": {
     "@tauri-apps/cli": "3.0.0-alpha.6"
